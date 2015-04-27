@@ -1,5 +1,17 @@
 // load Unit.js module
 var test = require('unit.js');
+var stringUtils = require('../js/StringUtils.js');
+
+describe('Test suite 1', function(){
+	it('Test case 1', function(){
+		var token = stringUtils.getToken('asdf', 3, 0);
+		test
+		.string(token)
+		.startsWith('asd')
+		
+		console.log(token);
+	})
+});
 
 describe('Learning by the example', function(){
 	it('example variable', function(){

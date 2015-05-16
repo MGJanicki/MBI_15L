@@ -1,6 +1,7 @@
 var test = require('unit.js');
 var assert = test.assert;
 var highScoringPairs = require('../js/HighScoringPairs.js');
+var utils = require('../js/Utils.js');
 
 describe('High scoring pairs test', function(){
 	
@@ -22,8 +23,6 @@ describe('High scoring pairs test', function(){
 		}
 	}
 	
-	console.log(scoringMatrix);
-	
 	it('One pair test', function(){
 		//sprawdzenie pary identycznych sekwencji
 		var score = highScoringPairs.score('ATTGC', 'ATTGC', scoringMatrix);
@@ -35,22 +34,22 @@ describe('High scoring pairs test', function(){
 		console.log(score);
 		
 		//oraz trochę różniących się od siebie
-		score = highScoringPairs.getToken('ATTGC', 'TTTTT', scoringMatrix);
+		score = highScoringPairs.score('ATTGC', 'TTTTT', scoringMatrix);
 		
-		test.string(score);
+		test.number(score);
 		
 		assert.strictEqual(score, 2);
 		
 		console.log(score);
 	});
 	
-	it('Tokenize test', function(){
-		//sprawdzenie funkcji zwracającej tablicę z wynikiem dla wysoko ocenianych par
+	it('HSP test', function(){
+		//sprawdzenie funkcji zwracającej tablicę z wynikiem dla wysoko ocenianych par danej sekwencji
 		var pairs = highScoringPairs.findHSP('ATT', scoringMatrix, 2);
 		
 		test.array(pairs);
 		
-		assert.strictEqual(pairs["ATT"]["ATA"], 2);
+		assert.strictEqual(pairs["ATA"], 2);
 		
 		console.log(pairs);
 	});

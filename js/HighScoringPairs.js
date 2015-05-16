@@ -15,7 +15,7 @@ exports.score = function(sequence1, sequence2, scoringMatrix)
 	return score(sequence1, sequence2, scoringMatrix);
 }
 
-exports.findHSP() = function(sequence, scoringMatrix, treshold)
+exports.findHSP = function(sequence, scoringMatrix, treshold)
 {
 	return findHSP(sequence, scoringMatrix, treshold)
 }

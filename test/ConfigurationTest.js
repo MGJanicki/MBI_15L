@@ -12,7 +12,7 @@ describe('Validator - check if user input is correct', function(){
 		test.bool(validationResult).isTrue();
 		
 		//niewłaściwe dane wejściowe - symbole spoza alfabetu
-		var validationResult = validator.validateSequence('ASDFGH');
+		validationResult = validator.validateSequence('ASDFGH');
 		
 		test.bool(validationResult).isFalse();
 	});
@@ -53,4 +53,34 @@ describe('Validator - check if user input is correct', function(){
 		
 		test.bool(validationResult).isFalse();
 	});
+	
+	it('Validate treshold parameter', function(){
+		//prawidłowe dane wejściowe - parametr określający próg odrzucenia musi być liczbą całkowitą
+		var validationResult = validator.validateMinimumScore(10);
+		
+		test.bool(validationResult).isTrue();
+		
+		//niewłaściwe dane wejściowe - podany parametr jest literą
+		validationResult = validator.validateMinimumScore('a');
+		
+		test.bool(validationResult).isFalse();
+	});
+	
+	it('Validate token length', function(){
+		//prawidłowe dane wejściowe - parametr określający długość słowa-ziarna musi być dodatni
+		var validationResult = validator.validateInputLength(10);
+		
+		test.bool(validationResult).isTrue();
+		
+		//niewłaściwe dane wejściowe - parametr nie może być liczbą ujemną
+		validationResult = validator.validateInputLength(-3);
+		
+		test.bool(validationResult).isFalse();
+		
+		//niewłaściwe dane wejściowe - parametr nie może być literą
+		validationResult = validator.validateInputLength('a');
+		
+		test.bool(validationResult).isFalse();
+	});
+	
 });

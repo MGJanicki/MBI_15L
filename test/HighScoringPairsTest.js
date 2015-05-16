@@ -45,14 +45,12 @@ describe('High scoring pairs test', function(){
 	});
 	
 	it('Tokenize test', function(){
-		//sprawdzenie funkcji zwracającej tablicę wysoko ocenianych par
+		//sprawdzenie funkcji zwracającej tablicę z wynikiem dla wysoko ocenianych par
 		var pairs = highScoringPairs.findHSP('ATT', scoringMatrix, 2);
 		
 		test.array(pairs);
 		
-		//właściwym wynikiem dla podanych parametrów jest 13 - sekwencja identyczna 
-		//i wszystkie różniące się jednym nukleotydem od sekwencji ATT
-		assert.strictEqual(tokens.length, 13);
+		assert.strictEqual(pairs["ATT"]["ATA"], 2);
 		
 		console.log(pairs);
 	});

@@ -15,17 +15,27 @@ function validateSequence(sequence)
 
 function validateMatrix(matrix)
 {
-	
+	for(i = 0; i < matrix.length; i++)
+	{
+		for(j = 0; j < matrix[i].length; j++)
+		{
+			if(isNaN(matrix[i][j]))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 function validateInputLength(inputLength)
 {
-	
+	return !isNaN(inputLength) && inputLength > 0;
 }
 
 function validateMinimumScore(score)
 {
-	
+	return !isNaN(score);
 }
 
 exports.validateSequence = function(sequence)
@@ -36,4 +46,14 @@ exports.validateSequence = function(sequence)
 exports.validateMatrix = function(matrix)
 {
 	return validateMatrix(matrix);
+}
+
+exports.validateInputLength = function(inputLength)
+{
+	return validateInputLength(inputLength)
+}
+
+exports.validateMinimumScore = function(score)
+{
+	return validateMinimumScore(score);
 }

@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Algorytm BLAST</title>
+    <link href="Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width" />
+    <script src="Scripts/jquery-1.9.1.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <script>
+        var shown = 'Info';
+        var databaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
+            "ATTGATTTAGTATATGATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
+            "ATTGATTTAGTATATTGTTAAATGTATATATTAATTCAATTTTATTATTCTATTCATTTTTATTCATTTT",
+            "ATTGATTTAGTTTATTATTAAAGGTATATATTAATTCAATATTATTATTCTATTCATTTTTTTTCATTTT",
+            "AATGATTTAGTTTATTATTAAAGGTATATATTAATTCAATATTATTATTCTATTCATTTTTTTTCATTTT",
+            "CAAGAAGCGATGGGAACGATGTAATCCATGAATACAGAAGATTCAATTGAAAAAGATCCTAATGATTCAT",
+            "TTCATATTCAATTAAAATTGAAATTTTTTCATTCGCGAGGAGCCGGATGAGAAGAAACTCTCATGTCCGG",
+            "CAAATTTATAATATATTAATCTATATATTAATTTAGAATTCTATTCTAATTCGAATTCAATTTTTAAATA"];
+        var defaultMatrixValues = [
+            [1, -1, -1, -1],
+            [-1, 1, -1, -1],
+            [-1, -1, 1, -1],
+            [-1, -1, -1, 1]
+        ];
+        var views = ["Screen1",
+            "Screen2",
+            "Screen3",
+            "Screen4",
+            "Screen5",
+            "Screen6"
+        ]
+
+        function show(subpageToShow) {
+            document.getElementById(shown).style.display = 'none';
+            document.getElementById(subpageToShow).style.display = 'block';
+            shown = subpageToShow;
+            
+            return false;
+        }
+
+        function resetMatrix() {
+            var letters = ["A", "C", "G", "T"];
+            var id = "";
+            for (var i = 0; i < letters.length; ++i) {
+                for (var j = 0; j < letters.length; ++j) {
+                    id = letters[i] + "to" + letters[j];
+                    document.getElementById(id).value = defaultMatrixValues[i][j];
+                }
+            }
+        }
+
+        function deleteRow(button) {
+            var i = button.parentNode.parentNode.rowIndex;
+            document.getElementById('DNARecords').deleteRow(i);
+        };
+
+        function addRow(table, text, disabled) {
+            var row = table.insertRow(table.rows.length);
+            var cell1 = row.insertCell(0);
+            cell1.style = "width: 95%";
+            var element1 = document.createElement("input");
+            element1.type = "text";
+            element1.class = "form-control";
+            element1.style = "width: 100%";
+            if (disabled) element1.disabled = "true";
+            element1.value = text;
+            cell1.appendChild(element1);
+            var cell2 = row.insertCell(1);
+            var element2 = document.createElement("input");
+            element2.type = "button";
+            element2.class = "btn btn-lg";
+            element2.value = "Usuń";
+            element2.onclick = function () { deleteRow(this); }
+            cell2.appendChild(element2);
+        }
+
+        function resetDNARecords() {
+            var table = document.createElement('tbody');
+            table.id = 'DNARecords';
+            for (var i = 0; i < databaseSets.length; ++i) {
+                addRow(table, databaseSets[i], true)
+            }
+            var old_tbody = document.getElementById('DNARecords');
+            old_tbody.parentNode.replaceChild(table, old_tbody)
+        }
+
+        function addDNARecord() {
+            var table = document.getElementById('DNARecords');
+            addRow(table, "", false);
+        }
+
+        $(document).ready(function () {
+            resetMatrix();
+            resetDNARecords();
+        });
+
+    </script>
+</head>
+<body>
+    <form>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/index.html">Algorytm BLAST</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#" onclick="return show('Info');">O projekcie</a></li>
+                        <li><a href="#" onclick="return show('Screen1');">Prezentacja algorytmu</a></li>
+                    </ul>
+                </div>
+                <!--/.nav-collapse -->
+            </div>
+            <!--/.container-fluid -->
+        </nav>
+        <div class="container-fluid">
+            <div id="Info">
+                <div class="jumbotron">
+                    <h2>Wyszukiwanie sekwencji podobnej do danej metodą BLAST</h2>
+
+                    <p>Witaj na stronie prezentującej działanie algorytmu BLAST wyszukiwania sekwencji podobnej do danej.</p>
+                    <p><a class="btn btn-lg btn-primary" href="#" onclick="javascript:show('Screen1');">Przejdź do demonstracji &raquo;</a></p>
+                    <p>
+                        <b>Algorytm BLAST</b> (Basic Local Aligment Search Tool) to heurystyczny algorytm porównywania sekwencji DNA lub białek.
+                        Zazwyczaj sekwencje nukleotydów i aminokwasów są długie i porównywanie ich w całości ze znanymi wzorcami
+                        jest zagadnieniem czasochłonnym i złożonym. Aby skrócić czas obliczeń, algorytm BLAST nie porównuje
+                        całej zadanej sekwencji, lecz dzieli ją na krótsze fragmenty - słowa. Długość słów jest parametrem wejściowym algorytmu.
+                        Kolejnym krokiem algorytmu jest wyszukanie tych rekordów bazy danych, w których występuje szukane słowo lub podobne do niego
+                        (oznacza to wartość podobieństwa wyższą od zadanego progu T). W ostatnim kroku algorytm rozszerza ciągi referencyjne
+                        (w prawo lub lewo) i ponownie dokonuje ich oceny. Rozszerzenie jest wykonywane do momentu aż ocena spadnie poniżej
+                        progu podobieństwa. Wynikiem końcowym algorytmu są rekordy o największym podobieństwie do zadanej sekwencji.
+                    </p>
+                </div>
+            </div>
+            <div id="Screen1" style="display:none">
+                <h1>Etap 1.</h1>
+                <h2>Ustaw parametry demonstracji</h2>
+                <h3>Wprowadź sekwencję:</h3>
+                <input title="Wprowadź sekwencję aminokwasową do porównwania z sekwencjami w bazie danych. Sekwencja musi składać się jedynie z liter A, T, C, G"
+                       style="width: 50%" type="text" class="form-control" id="sequence" />
+                <h3>Wybierz długość słowa:</h3>
+                <input title="Wybierz długość słów dla których obliczany będzie stopień zgodności"
+                       class="input-sm" type="number" min="1" />
+                <h3>Ustaw parametry macierzy podobieństwa:</h3>
+                <table class="table table-bordered" style="width: 30%">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>A</th>
+                            <th>C</th>
+                            <th>G</th>
+                            <th>T</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>A</th>
+                            <td><input id="AtoA" class="input-sm" type="number" /></td>
+                            <td><input id="AtoC" class="input-sm" type="number" /></td>
+                            <td><input id="AtoG" class="input-sm" type="number" /></td>
+                            <td><input id="AtoT" class="input-sm" type="number" /></td>
+                        </tr>
+                        <tr>
+                            <th>C</th>
+                            <td><input id="CtoA" class="input-sm" type="number" /></td>
+                            <td><input id="CtoC" class="input-sm" type="number" /></td>
+                            <td><input id="CtoG" class="input-sm" type="number" /></td>
+                            <td><input id="CtoT" class="input-sm" type="number" /></td>
+                        </tr>
+                        <tr>
+                            <th>G</th>
+                            <td><input id="GtoA" class="input-sm" type="number" /></td>
+                            <td><input id="GtoC" class="input-sm" type="number" /></td>
+                            <td><input id="GtoG" class="input-sm" type="number" /></td>
+                            <td><input id="GtoT" class="input-sm" type="number" /></td>
+                        </tr>
+                        <tr>
+                            <th>T</th>
+                            <td><input id="TtoA" class="input-sm" type="number" /></td>
+                            <td><input id="TtoC" class="input-sm" type="number" /></td>
+                            <td><input id="TtoG" class="input-sm" type="number" /></td>
+                            <td><input id="TtoT" class="input-sm" type="number" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><input type="button" class="btn btn-danger" onclick="return resetMatrix();" value="Resetuj macierz" /></p>
+                <h3>Baza fragmentów DNA:</h3>
+                <table class="table table-bordered" style="width: 80%">
+                    <tbody id="DNARecords" />
+                </table>
+                <p><input type="button" class="btn btn-success" onclick="return addDNARecord();" value="Dodaj ciąg" /></p>
+                <p><input type="button" class="btn btn-danger" onclick="return resetDNARecords();" value="Resetuj bazę danych" /></p>
+                <br /><br /><br /><br />
+                <nav class="navbar navbar-fixed-bottom navbar-default" id="bottomNavbar">
+                    <div class="container-fluid">
+                        <div id="navbar" class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="disabled" id="previousStep"><a href="#">Poprzedni krok</a></li>
+                                <li id="nextStep"><a href="#" onclick="return show('Screen2');">Następny krok</a></li>
+                            </ul>
+                        </div>
+                        <!--/.nav-collapse -->
+                    </div>
+                    <!--/.container-fluid -->
+                </nav>
+            </div>
+            <div id="Screen2" style="display:none">
+
+            </div>
+            <div id="Screen3" style="display:none">
+            </div>
+            <div id="Screen4" style="display:none">
+            </div>
+            <div id="Screen5" style="display:none">
+            </div>
+            <div id="Screen6" style="display:none">
+            </div>
+        </div>
+    </form>
+</body>
+</html>

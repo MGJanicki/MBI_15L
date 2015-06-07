@@ -1,4 +1,57 @@
-﻿var shown = 'Info';
+﻿/***************************************
+ *			START Validator.js		   *
+ ***************************************/
+ 
+ function validateSequence(sequence)
+{
+	//podniesienie tekstu do wilekich liter - można walidować
+	sequence = sequence.toUpperCase();
+	for(i = 0; i < sequence.length; i++)
+	{
+		if(sequence[i] !== 'A' && sequence[i] !== 'C' && sequence[i]
+			&& sequence[i] !== 'G' && sequence[i] !== 'T')
+			{
+				return false;
+			}
+	}
+	return true;
+}
+
+function validateMatrix(matrix)
+{
+	for(i = 0; i < matrix.length; i++)
+	{
+		for(j = 0; j < matrix[i].length; j++)
+		{
+			if(isNaN(parseInt(matrix[i][j])))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function validateInputLength(inputLength)
+{
+	return !isNaN(parseInt(inputLength)) && parseInt(inputLength) > 0;
+}
+
+function validateSequenceLength(inputLength, sequenceLength)
+{
+	return !isNaN(inputLength) && !isNaN(sequenceLength) && sequenceLength > inputLength;
+}
+
+function validateMinimumScore(score)
+{
+	return !isNaN(parseInt(score));
+}
+
+/***************************************
+ *			END Validator.js		   *
+ ***************************************/
+
+var shown = 'Info';
 var databaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATGATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATTGTTAAATGTATATATTAATTCAATTTTATTATTCTATTCATTTTTATTCATTTT",
@@ -85,12 +138,12 @@ function processScreen1() {
     }
     sequence = document.getElementById("sequence").value;
     wordLength = document.getElementById('word_length').value;
-
+	
     var err = "";
-    if (1 != 1) err += "Nieprawidłowy ciąg wejściowy! " //tutaj walidacja ciagu wejsciowego
-    if (isNaN(parseInt(wordLength))) err += "Nieprawidłowa długość słowa! "
-    if(parseInt(wordLength)>parseInt(sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji"
-    if (1 != 1) err += "Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
+    if (!validateSequence(sequence)) err += "Nieprawidłowy ciąg wejściowy! " //tutaj walidacja ciagu wejsciowego
+    if (!validateInputLength(wordLength)) err += "Nieprawidłowa długość słowa! "
+    if (!validateSequenceLength(wordLength, sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji"
+    if (!validateMatrix(matrix)) err += "Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
 
 
     if (err == "") {

@@ -2,7 +2,7 @@ var test = require('unit.js');
 var assert = test.assert;
 var smithWaterman = require('../js/SmithWaterman.js');
 
-describe('High scoring pairs test', function(){
+describe('Smith-Waterman algorithm implementation test', function(){
 	
 	//inicjalizacja macierzy podobieñstwa wykorzystywanej do testów
 	var scoringMatrix = [];

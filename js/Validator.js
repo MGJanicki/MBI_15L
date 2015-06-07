@@ -19,7 +19,7 @@ function validateMatrix(matrix)
 	{
 		for(j = 0; j < matrix[i].length; j++)
 		{
-			if(isNaN(matrix[i][j]))
+			if(isNaN(parseInt(matrix[i][j])))
 			{
 				return false;
 			}
@@ -30,12 +30,12 @@ function validateMatrix(matrix)
 
 function validateInputLength(inputLength)
 {
-	return !isNaN(inputLength) && inputLength > 0;
+	return !isNaN(parseInt(inputLength)) && parseInt(inputLength) > 0;
 }
 
 function validateMinimumScore(score)
 {
-	return !isNaN(score);
+	return !isNaN(parseInt(score));
 }
 
 exports.validateSequence = function(sequence)

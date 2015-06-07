@@ -21,7 +21,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/index.html">Algorytm BLAST</a>
+                    <a href="#" class="navbar-brand" onclick="return show('Info');">Algorytm BLAST</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -199,6 +199,33 @@
                 </nav>
             </div>
             <div id="Screen5" style="display:none">
+                <h1>Etap 5.</h1>
+                <h2>Rozrost słów</h2>
+                <p>
+                    Na tym etapie słowa ziarna są rozszerzane o kolejne nukleotydy ze słowa wejściowego. 
+                    Po każdym kroku sprawdzana jest ich lokalna miara podobieństwa do słów znalezionych w bazie
+                    danych. Słowa o podobieństwie niższym od wcześniej wybranego progu są odrzucane z dalszej analizy.
+                </p>
+                <h3>Ocena podobieństwa lokalnego: </h3>
+                <p>
+                    <input type="button" class="btn btn-lg btn-success" value="Następny krok" onclick="return executeStep();"/>
+                    <input type="button" class="btn btn-lg btn-warning" value="Przelicz wszystko" onclick="return executeAll();" />
+                </p>
+                <div id="RatingRecords"></div>
+
+                <br /><br /><br /><br />
+                <nav class="navbar navbar-fixed-bottom navbar-default" id="bottomNavbar">
+                    <div class="container-fluid">
+                        <div id="navbar" class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                <li id="previousStep"><a href="#" onclick="return show('Screen4');">Poprzedni krok</a></li>
+                                <li id="nextStep"><a href="#" onclick="return finish();">Następny krok</a></li>
+                            </ul>
+                        </div>
+                        <!--/.nav-collapse -->
+                    </div>
+                    <!--/.container-fluid -->
+                </nav>
             </div>
             <div id="Screen6" style="display:none">
             </div>

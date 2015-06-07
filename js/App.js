@@ -1,4 +1,4 @@
-/***************************************
+﻿/***************************************
  *			START Utils.js		       *
  ***************************************/
  
@@ -24,7 +24,7 @@ function getNucleotideForIndex(index)
 	}
 }
 
-//rekurencyjna funkcja generująca wszystkie możliwe sekwencje o zadanej długości
+//rekurencyjna funkcja generujÄ…ca wszystkie moĹĽliwe sekwencje o zadanej dĹ‚ugoĹ›ci
 function generateAllSequences(length, depth)
 {
 	if(length === depth)
@@ -32,7 +32,7 @@ function generateAllSequences(length, depth)
 		return ['A', 'C', 'G', 'T'];
 	}
 
-	//tablice potrzebne przy generowaniu sekwencji - z wynikami działania poziom niżej oraz wyjściowa
+	//tablice potrzebne przy generowaniu sekwencji - z wynikami dziaĹ‚ania poziom niĹĽej oraz wyjĹ›ciowa
 	var returnArray = [];
 	var partialSequencesArray = generateAllSequences(length, depth + 1);
 	
@@ -40,7 +40,7 @@ function generateAllSequences(length, depth)
 	{
 		for(j = 0; j < 4; j++)
 		{
-			//doklejenie kolejnego nukleotydu do sekwencji - pętla w pętli zapewnia rozpatrzenie wszystkich możliwości
+			//doklejenie kolejnego nukleotydu do sekwencji - pÄ™tla w pÄ™tli zapewnia rozpatrzenie wszystkich moĹĽliwoĹ›ci
 			returnArray.push(partialSequencesArray[i].concat(getNucleotideForIndex(j)));
 		}
 	}
@@ -51,13 +51,13 @@ function generateAllSequences(length, depth)
  *			END Utils.js		   	   *
  ***************************************/
 
-﻿/***************************************
+/***************************************
  *			START Validator.js		   *
  ***************************************/
  
  function validateSequence(sequence)
 {
-	//podniesienie tekstu do wilekich liter - można walidować
+	//podniesienie tekstu do wilekich liter - moĹĽna walidowaÄ‡
 	sequence = sequence.toUpperCase();
 	for(i = 0; i < sequence.length; i++)
 	{
@@ -104,7 +104,7 @@ function validateMinimumScore(score)
  *			END Validator.js		   *
  ***************************************/
 
- ﻿/***************************************
+/***************************************
  *			START StringUtils.js		   *
  ***************************************/
  
@@ -130,13 +130,13 @@ function tokenize(word, tokenLength)
 /***************************************
  *		START HighScoringPairs.js	   *
  ***************************************/
- //funkcja oceny pary sekwencji dla zadanej macierzy podobieństwa
-//założenie - sekwencje na wejściu są tej samej długości (w końcu sami produkujemy sequence2 na podstawie sequence1)
+ //funkcja oceny pary sekwencji dla zadanej macierzy podobieĹ„stwa
+//zaĹ‚oĹĽenie - sekwencje na wejĹ›ciu sÄ… tej samej dĹ‚ugoĹ›ci (w koĹ„cu sami produkujemy sequence2 na podstawie sequence1)
 function score(sequence1, sequence2, scoringMatrix)
 {
 	var score = 0;
-	var nucleotideIndex1; //indeks w macierzy podobieństwa nukleotydu z pierwszej sekwencji
-	var nucleotideIndex2; //indeks w macierzy podobieństwa nukleotydu z drugiej sekwencji
+	var nucleotideIndex1; //indeks w macierzy podobieĹ„stwa nukleotydu z pierwszej sekwencji
+	var nucleotideIndex2; //indeks w macierzy podobieĹ„stwa nukleotydu z drugiej sekwencji
 	for(i = 0; i < sequence1.length; i++)
 	{
 		nucleotideIndex1 = getNucletideIndex(sequence1[i]);
@@ -146,7 +146,7 @@ function score(sequence1, sequence2, scoringMatrix)
 	return score;
 }
 
-//funkcja znajdująca wszystkie wysoko oceniane pary dla zadanej sekwencji
+//funkcja znajdujÄ…ca wszystkie wysoko oceniane pary dla zadanej sekwencji
 function findHSP(sequence, scoringMatrix, treshold)
 {
 	var hspArray = [];
@@ -201,6 +201,7 @@ var tokens = [];
 var seeds;
 var searchResults;
 var tresholdC;
+var finished=false;
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -279,7 +280,7 @@ function prepareScreen4() {
             for (var k = 0; k < searchResults[i][j].length; ++k) {
                 var text = databaseSets[searchResults[i][j][k][0]];
                 var index =searchResults[i][j][k][1];
-                var seedLength=seeds[i][j].length;
+                var seedLength=seeds[i][j].sequence.length;
                 var coloured = text.substring(0, index)
                     + '<span style="color:#f00;">' + text.substring(index, index + seedLength) + '</span>'
                     + text.substring(index + seedLength);
@@ -295,7 +296,58 @@ function prepareScreen4() {
     }
 }
 
+function finish() {
+    if (finished) {
+        show("Screen6");
+    }
+    else {
+        alert('Nie wykonano wszystkich kroków algorytmu!');
+    }
+}
+
+function executeStep() { }
+
+function executeAll() { }
+
+function prepareScreen5() {
+    var div = document.getElementById("RatingRecords");
+    //czyszczenie zawartości
+    while (div.firstChild) {
+        div.removeChild(div.firstChild);
+    }
+    for (var i = 0; i < seeds.length; ++i) {
+        for (var j = 0; j < seeds[i].length; ++j) {
+            for (var k = 0; k < searchResults[i][j].length; ++k) {
+                var text = databaseSets[searchResults[i][j][k][0]];
+                var seed = seeds[i][j].seed;
+                var index = searchResults[i][j][k][1];
+                var header1 = document.createElement('h3');
+                header1.innerHTML = "Słowo- ziarno:" + seed.toString();
+                var header2 = document.createElement('h4');
+                header2.innerHTML = "Wynik:" + searchResults[i][j][k][3].toString();
+                var table = document.createElement('table');
+                table.className = "table table-bordered";
+                var row_0 = table.insertRow(table.rows.length);
+                var row_1 = table.insertRow(table.rows.length);
+                for (var l = 0; l < text.length; ++l) {
+                    row_0.insertCell(l).appendChild(document.createTextNode(text[l]));
+                    if (l < index || l >= index + seed.length) {
+                        row_1.insertCell(l).appendChild(document.createTextNode(''));
+                    }
+                    else {
+                        row_1.insertCell(l).appendChild(document.createTextNode(seed[l-index]));
+                    }
+                }
+                div.appendChild(header1);
+                div.appendChild(header2);
+                div.appendChild(table);
+            }
+        }
+    }
+}
+
 function processScreen1() {
+    finished = false;
     matrix = new Array();
     for (var i = 0; i < letters.length; ++i) {
         matrix.push([]);
@@ -338,7 +390,9 @@ function processScreen1() {
             databaseSets.push(dnaRecords.rows[i].cells[0].firstChild.value);
         }
         //searchResults jest tablicą wielowymiarowa: 
-        //[indeks podslowa][indeks ziarna][[indeks slowa w bazie],[indeks ziarna w slowie z bazy]] 
+        //[indeks podslowa]
+        //[indeks ziarna]
+        //[[indeks slowa z bazy danych],[indeks ziarna w slowie z bazy],[dlugosc],[przesuniecie w lewo],[ocena]] 
         searchResults = new Array();
         for (var i = 0; i < tokens.length; ++i) {
             //podslowa
@@ -352,7 +406,11 @@ function processScreen1() {
                     var index = databaseRecord.indexOf(seeds[i][j].sequence);
                     //wystapienie w roznych miejscach dla tego samego slowa
                     while (index > -1) {
-                        indexesForSeed.push([k,index]);
+                        var seed = seeds[i][j].seed;
+                        var seed_length = seed.length;
+                        var stringToCompare = databaseRecord.substring(index, index+seed_length);
+                        var rate = score(seed,stringToCompare,matrix); 
+                        indexesForSeed.push([k, index, 0, rate]);
                         databaseRecord = databaseRecord.substring(index + seeds[i][j].sequence.length);
                         index = databaseRecord.indexOf(seeds[i][j].sequence);
                     }
@@ -365,13 +423,13 @@ function processScreen1() {
 
         //DODAWANIE KOLEJNYCH NUKLEOTYDÓW
         tresholdC = document.getElementById("TresholdC");
+        prepareScreen5();
         show("Screen2");
     }
     else {
         alert(err);
     }
 }
-
 
 function resetMatrix() {
     var id = "";
@@ -382,8 +440,6 @@ function resetMatrix() {
         }
     }
 }
-
-//#region DNADatabase
 
 function deleteRow(button) {
     if (confirm("Czy na pewno chcesz usunąć rekord?")) {
@@ -426,8 +482,6 @@ function addDNARecord() {
     var table = document.getElementById('DNARecords');
     addRow(table, "", false);
 }
-
-//#end region
 
 $(document).ready(function () {
     resetMatrix();

@@ -159,7 +159,7 @@ function findHSP(sequence, scoringMatrix, treshold)
 		//założenie - wartość progowa jest zaliczana do wysoko ocenianych par
 		if(pairScore >= treshold)
 		{
-			hspArray.push({seed: sequenceArray[i], sequence: sequenceArray[i]});
+			hspArray.push({seed: pairScore, sequence: sequenceArray[i]});
 		}
 	}
 	

@@ -1,4 +1,5 @@
-﻿var shown = 'Info';
+﻿
+var shown = 'Info';
 var databaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATGATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATTGTTAAATGTATATATTAATTCAATTTTATTATTCTATTCATTTTTATTCATTTT",
@@ -13,24 +14,50 @@ var defaultMatrixValues = [
     [-1, -1, 1, -1],
     [-1, -1, -1, 1]
 ];
-var views = ["Screen1",
-    "Screen2",
-    "Screen3",
-    "Screen4",
-    "Screen5",
-    "Screen6"
-]
+
+var matrix = [
+    [1, -1, -1, -1],
+    [-1, 1, -1, -1],
+    [-1, -1, 1, -1],
+    [-1, -1, -1, 1]
+];
+
+var letters = ["A", "C", "G", "T"];
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
     document.getElementById(subpageToShow).style.display = 'block';
     shown = subpageToShow;
-
     return false;
 }
 
+var sequence = "";
+
+function processScreen1() {
+    matrix = new Array();
+    for (var i = 0; i < letters.length; ++i) {
+        matrix.push([]);
+        for (var j = 0; j < letters.length; ++j) {
+            matrix[i][j] = document.getElementById(letters[i] + "to" + letters[j]).value;
+        }
+    }
+
+    sequence = document.getElementById("sequence").value;
+    var err = "";
+    if (1 != 1) err += "Nieprawidłowy ciąg wejściowy! " //tutaj walidacja ciagu wejsciowego
+    if(1!= 1) err+="Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
+
+    if (err=="") { 
+        show("Screen2");
+    }
+    else {
+        alert(err);
+    }
+
+}
+
+
 function resetMatrix() {
-    var letters = ["A", "C", "G", "T"];
     var id = "";
     for (var i = 0; i < letters.length; ++i) {
         for (var j = 0; j < letters.length; ++j) {
@@ -40,9 +67,13 @@ function resetMatrix() {
     }
 }
 
+//#region DNADatabase
+
 function deleteRow(button) {
-    var i = button.parentNode.parentNode.rowIndex;
-    document.getElementById('DNARecords').deleteRow(i);
+    if (confirm("Czy na pewno chcesz usunąć rekord?")) {
+        var i = button.parentNode.parentNode.rowIndex;
+        document.getElementById('DNARecords').deleteRow(i);
+    }
 };
 
 function addRow(table, text, disabled) {
@@ -57,11 +88,11 @@ function addRow(table, text, disabled) {
     element1.value = text;
     cell1.appendChild(element1);
     var cell2 = row.insertCell(1);
-    var element2 = document.createElement("input");
-    element2.type = "button";
+    var element2 = document.createElement("a");
     element2.class = "btn btn-lg";
     element2.value = "Usuń";
     element2.onclick = function () { deleteRow(this); }
+    element2.innerHTML="<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>";
     cell2.appendChild(element2);
 }
 
@@ -79,6 +110,8 @@ function addDNARecord() {
     var table = document.getElementById('DNARecords');
     addRow(table, "", false);
 }
+
+//#end region
 
 $(document).ready(function () {
     resetMatrix();

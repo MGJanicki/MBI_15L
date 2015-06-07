@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width" />
     <script src="Scripts/jquery-1.9.1.js"></script>
     <script src="Scripts/bootstrap.js"></script>
+    <script src="js/Validator.js"></script>
     <script src="js/App.js"></script>
 </head>
 <body>
@@ -116,7 +117,7 @@
                         <div id="navbar" class="navbar-collapse collapse">
                             <ul class="nav navbar-nav">
                                 <li class="disabled" id="previousStep"><a href="#">Poprzedni krok</a></li>
-                                <li id="nextStep"><a href="#" onclick="return show('Screen2');">Następny krok</a></li>
+                                <li id="nextStep"><a href="#" onclick="return processScreen1();">Następny krok</a></li>
                             </ul>
                         </div>
                         <!--/.nav-collapse -->

@@ -321,6 +321,8 @@ function prepareScreen5() {
                 header1.innerHTML = "Słowo- ziarno: " + seed;
                 var header2 = document.createElement('h4');
                 header2.innerHTML = "Wynik: " + searchResults[i][j][k].score.toString();
+                if (searchResults[i][j][k].score < tresholdC)
+                    header2.innerHTML = header2.innerHTML +  '<span style="color:#f00;"> Rekord odrzucony</span>';
                 var table = document.createElement('table');
                 table.className = "table table-bordered";
                 var row_0 = table.insertRow(table.rows.length);
@@ -342,26 +344,40 @@ function prepareScreen5() {
     }
 }
 
-
-function executeStep() {
+function processStep() {
+    finished = true;
     for (var i = 0; i < searchResults.length; ++i) {
         for (var j = 0; j < searchResults[i].length; ++j) {
             for (var k = 0; k < searchResults[i][j].length; ++k) {
                 var result = searchResults[i][j][k]
-                var moveLeft =  result.moveLeft;
+                var moveLeft = result.moveLeft;
                 var indexInDbSet = result.index - moveLeft
                 var indexInSequence = i - moveLeft;
                 var databaseSet = databaseSets[result.DbSetNr];
                 var seed = result.seed;
                 var currScore = result.score;
-                var result = 15 //expand(seed,sequence,databaseSet,indexInDbSet,indexInSequence,currScore); tutaj funkcja expand
-
+                if (currScore >= tresholdC&&seed.length<sequence.length) { //przetwarzamy tylko rekordy o minimalnej zgodności
+                    var result = 0 //expand(seed,sequence,databaseSet,indexInDbSet,indexInSequence,currScore); tutaj funkcja expand
+                    //logika aktualizujaca rekord w searchResults - do napisania
+                    searchResults[i][j][k].score = 0;
+                    finished = false; //jezeli chociaz jeden rekord zostal przetworzony to nie skonczylismy
+                }
             }
         }
     }
 }
 
-function executeAll() { }
+
+function executeStep() {
+    processStep();
+    prepareScreen5();
+}
+
+function executeAll() {
+    //wykonaj wszystkie kroki do konca
+    while (!finished) processStep();
+    prepareScreen5();
+}
 
 function processScreen1() {
     finished = false;
@@ -439,7 +455,7 @@ function processScreen1() {
         prepareScreen4();
 
         //DODAWANIE KOLEJNYCH NUKLEOTYDÓW
-        tresholdC = document.getElementById("TresholdC");
+        tresholdC = document.getElementById("TresholdC").value;
         prepareScreen5();
         show("Screen2");
     }

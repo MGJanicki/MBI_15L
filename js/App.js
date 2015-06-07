@@ -36,6 +36,9 @@ function show(subpageToShow) {
 
 function refreshTokens() {
     var table = document.getElementById("Tokens");
+    while (table.firstChild) {
+        table.removeChild(table.firstChild);
+    }
     for (var i = 0; i < tokens.length; ++i) {
         table.insertRow(table.rows.length).insertCell(0).appendChild(document.createTextNode(tokens[i]));
     }

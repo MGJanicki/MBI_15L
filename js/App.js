@@ -28,6 +28,7 @@ var databaseSets;
 var tokens = [];
 var seeds;
 var searchResults;
+var tresholdC;
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -88,7 +89,7 @@ function prepareScreen4() {
         panel.className = "panel panel-default";
         var panelTitle = document.createElement("div");
         panelTitle.className = "panel-heading";
-        var heading = document.createElement("h4");
+        var heading = document.createElement("h3");
         heading.innerHTML = tokens[i];
         panelTitle.appendChild(heading);
         panel.appendChild(panelTitle);
@@ -139,10 +140,9 @@ function processScreen1() {
     if(parseInt(wordLength)>parseInt(sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji"
     if (1 != 1) err += "Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
 
-
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
-        //GATTTAGTATTTTATTAAATGT, dlugos= 7
+        //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugos= 7
         //PODZIAŁ NA PODSŁOWA
         tokens = ["GATTTAG", "ATTTAGT", "TTTAGTA", "TTAGTAT"] //tutaj skrypt dzielacy na podslowa
         prepareScreen2();
@@ -151,6 +151,7 @@ function processScreen1() {
         //obiekt seeds - tablica tablic, w każdym rzędzie tablica słów ziaren uzyskanych dla jednego podsłowa z obiektu tokens
         seeds = new Array();
         for (var i = 0; i < tokens.length; ++i) {
+            var tresholdT = document.getElementById("TresholdT");
             var seedsForToken = ["GATTTAG","ATTTAGT","TTTAGTA","TTAGTAT"]; //tutaj skrypt generujacy slowa ziarna dla token[i]
             seeds.push(seedsForToken);
         }
@@ -188,6 +189,8 @@ function processScreen1() {
         }
         prepareScreen4();
 
+        //DODAWANIE KOLEJNYCH NUKLEOTYDÓW
+        tresholdC = document.getElementById("TresholdC");
         show("Screen2");
     }
     else {

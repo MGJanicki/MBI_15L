@@ -271,7 +271,7 @@ function prepareScreen4() {
             var innerPanelTitle = document.createElement("div");
             innerPanelTitle.className = "panel-heading";
             var innerHeading = document.createElement("h4");
-            innerHeading.innerHTML = seeds[i][j];
+            innerHeading.innerHTML = seeds[i][j].sequence;
             innerPanelTitle.appendChild(innerHeading);
             innerPanel.appendChild(innerPanelTitle);
             var table = document.createElement('table');
@@ -349,12 +349,12 @@ function processScreen1() {
                 for (var k = 0; k < databaseSets.length; ++k) {
                     //slowa w bazie
                     databaseRecord = databaseSets[k];
-                    var index = databaseRecord.indexOf(seeds[i][j])
+                    var index = databaseRecord.indexOf(seeds[i][j].sequence);
                     //wystapienie w roznych miejscach dla tego samego slowa
                     while (index > -1) {
                         indexesForSeed.push([k,index]);
-                        databaseRecord = databaseRecord.substring(index + seeds[i][j].length);
-                        index = databaseRecord.indexOf(seeds[i][j])
+                        databaseRecord = databaseRecord.substring(index + seeds[i][j].sequence.length);
+                        index = databaseRecord.indexOf(seeds[i][j].sequence);
                     }
                 }
                 indexesForSubword.push(indexesForSeed);

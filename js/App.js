@@ -278,8 +278,8 @@ function prepareScreen4() {
             var table = document.createElement('table');
             table.className = "table table-striped";
             for (var k = 0; k < searchResults[i][j].length; ++k) {
-                var text = databaseSets[searchResults[i][j][k][0]];
-                var index =searchResults[i][j][k][1];
+                var text = databaseSets[searchResults[i][j][k].DbSetNr];
+                var index =searchResults[i][j][k].index;
                 var seedLength=seeds[i][j].sequence.length;
                 var coloured = text.substring(0, index)
                     + '<span style="color:#f00;">' + text.substring(index, index + seedLength) + '</span>'
@@ -305,10 +305,6 @@ function finish() {
     }
 }
 
-function executeStep() { }
-
-function executeAll() { }
-
 function prepareScreen5() {
     var div = document.getElementById("RatingRecords");
     //czyszczenie zawartości
@@ -318,13 +314,13 @@ function prepareScreen5() {
     for (var i = 0; i < seeds.length; ++i) {
         for (var j = 0; j < seeds[i].length; ++j) {
             for (var k = 0; k < searchResults[i][j].length; ++k) {
-                var text = databaseSets[searchResults[i][j][k][0]];
-                var seed = seeds[i][j].seed;
-                var index = searchResults[i][j][k][1];
+                var text = databaseSets[searchResults[i][j][k].DbSetNr];
+                var seed = searchResults[i][j][k].seed;
+                var index = searchResults[i][j][k].index;
                 var header1 = document.createElement('h3');
-                header1.innerHTML = "Słowo- ziarno:" + seed.toString();
+                header1.innerHTML = "Słowo- ziarno: " + seed;
                 var header2 = document.createElement('h4');
-                header2.innerHTML = "Wynik:" + searchResults[i][j][k][3].toString();
+                header2.innerHTML = "Wynik: " + searchResults[i][j][k].score.toString();
                 var table = document.createElement('table');
                 table.className = "table table-bordered";
                 var row_0 = table.insertRow(table.rows.length);
@@ -335,7 +331,7 @@ function prepareScreen5() {
                         row_1.insertCell(l).appendChild(document.createTextNode(''));
                     }
                     else {
-                        row_1.insertCell(l).appendChild(document.createTextNode(seed[l-index]));
+                        row_1.insertCell(l).appendChild(document.createTextNode(seed[l - index]));
                     }
                 }
                 div.appendChild(header1);
@@ -345,6 +341,27 @@ function prepareScreen5() {
         }
     }
 }
+
+
+function executeStep() {
+    for (var i = 0; i < searchResults.length; ++i) {
+        for (var j = 0; j < searchResults[i].length; ++j) {
+            for (var k = 0; k < searchResults[i][j].length; ++k) {
+                var result = searchResults[i][j][k]
+                var moveLeft =  result.moveLeft;
+                var indexInDbSet = result.index - moveLeft
+                var indexInSequence = i - moveLeft;
+                var databaseSet = databaseSets[result.DbSetNr];
+                var seed = result.seed;
+                var currScore = result.score;
+                var result = 15 //expand(seed,sequence,databaseSet,indexInDbSet,indexInSequence,currScore); tutaj funkcja expand
+
+            }
+        }
+    }
+}
+
+function executeAll() { }
 
 function processScreen1() {
     finished = false;
@@ -368,7 +385,7 @@ function processScreen1() {
 
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
-        //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugos= 7
+        //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugosc= 7
         //PODZIAŁ NA PODSŁOWA
         tokens = tokenize(sequence, parseInt(wordLength)) //tutaj skrypt dzielacy na podslowa
         prepareScreen2();
@@ -406,11 +423,11 @@ function processScreen1() {
                     var index = databaseRecord.indexOf(seeds[i][j].sequence);
                     //wystapienie w roznych miejscach dla tego samego slowa
                     while (index > -1) {
-                        var seed = seeds[i][j].seed;
+                        var seed = seeds[i][j].sequence;
                         var seed_length = seed.length;
                         var stringToCompare = databaseRecord.substring(index, index+seed_length);
                         var rate = score(seed,stringToCompare,matrix); 
-                        indexesForSeed.push([k, index, 0, rate]);
+                        indexesForSeed.push({ DbSetNr: k, seed: seed, index: index, moveLeft: 0, score: rate });
                         databaseRecord = databaseRecord.substring(index + seeds[i][j].sequence.length);
                         index = databaseRecord.indexOf(seeds[i][j].sequence);
                     }

@@ -30,6 +30,8 @@ describe('High scoring pairs test', function(){
 		
 		test.array(results);
 		
+		console.log(results);
+		
 		assert.strictEqual(results.length, 2);
 		
 		assert.strictEqual(results[0].index, 4);
@@ -38,7 +40,7 @@ describe('High scoring pairs test', function(){
 		
 		assert.strictEqual(results[0].sequenceLength, 3);
 		
-		assert.strictEqual(results[1].index, 1);
+		assert.strictEqual(results[1].index, 0);
 		
 		assert.strictEqual(results[1].score, 3);
 		

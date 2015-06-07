@@ -1,5 +1,4 @@
-﻿
-var shown = 'Info';
+﻿var shown = 'Info';
 var databaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATGATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATTGTTAAATGTATATATTAATTCAATTTTATTATTCTATTCATTTTTATTCATTTT",
@@ -15,14 +14,17 @@ var defaultMatrixValues = [
     [-1, -1, -1, 1]
 ];
 
+var letters = ["A", "C", "G", "T"];
+
 var matrix = [
     [1, -1, -1, -1],
     [-1, 1, -1, -1],
     [-1, -1, 1, -1],
     [-1, -1, -1, 1]
 ];
-
-var letters = ["A", "C", "G", "T"];
+var sequence = "";
+var wordLength = "";
+var tokens = [];
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -31,7 +33,18 @@ function show(subpageToShow) {
     return false;
 }
 
-var sequence = "";
+function refreshTokens() {
+    var table = document.getElementById("Tokens");
+    for (var i = 0; i < tokens.length; ++i) {
+        table.insertRow(table.rows.length).insertCell(0).appendChild(document.createTextNode(tokens[i]));
+    }
+}
+
+function prepareScreen2() {
+    document.getElementById("sequenceLabel").innerHTML = sequence;
+    document.getElementById("wordLengthLabel").innerHTML = wordLength.toString();
+    refreshTokens();
+}
 
 function processScreen1() {
     matrix = new Array();
@@ -41,19 +54,27 @@ function processScreen1() {
             matrix[i][j] = document.getElementById(letters[i] + "to" + letters[j]).value;
         }
     }
-
     sequence = document.getElementById("sequence").value;
+    wordLength = document.getElementById('word_length').value;
+
     var err = "";
     if (1 != 1) err += "Nieprawidłowy ciąg wejściowy! " //tutaj walidacja ciagu wejsciowego
-    if(1!= 1) err+="Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
+    if (isNaN(parseInt(wordLength))) err += "Nieprawidłowa długość słowa! "
+    if(parseInt(wordLength)>parseInt(sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji"
+    if (1 != 1) err += "Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
 
-    if (err=="") { 
+
+    if (err == "") {
+        //DZIAŁANIE ALGORYTMU
+        //podział na podsłowa
+        tokens = ['ACGTC', 'CCCAG', 'AAACTG', 'GTCSC'] //tutaj skrypt dzielacy na podslowa
+        prepareScreen2();
+
         show("Screen2");
     }
     else {
         alert(err);
     }
-
 }
 
 

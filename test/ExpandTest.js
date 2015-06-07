@@ -32,8 +32,7 @@ describe('Seed expanding function test', function(){
 		console.log(expandedObject);
 		
 		assert.strictEqual(expandedObject.newScore, 5);
-		assert.strictEqual(expandedObject.newSeq1Index, 0);
-		assert.strictEqual(expandedObject.newSeq2Index, 2);
+		assert.strictEqual(expandedObject.expandedLeft, true);
 		assert.strictEqual(expandedObject.newSeed, 'AAATT');
 		
 		//nie można rozszerzyć w lewo, bo szukane słowo nie ma już symboli po lewej stronie
@@ -44,8 +43,7 @@ describe('Seed expanding function test', function(){
 		console.log(expandedObject);
 		
 		assert.strictEqual(expandedObject.newScore, 4);
-		assert.strictEqual(expandedObject.newSeq1Index, 0);
-		assert.strictEqual(expandedObject.newSeq2Index, 2);
+		assert.strictEqual(expandedObject.expandedLeft, false);
 		assert.strictEqual(expandedObject.newSeed, 'AAAT');
 		
 		//nie można rozszerzyć w lewo, bo sekwencja na bazie nie ma już symboli po lewej stronie
@@ -56,20 +54,18 @@ describe('Seed expanding function test', function(){
 		console.log(expandedObject);
 		
 		assert.strictEqual(expandedObject.newScore, 4);
-		assert.strictEqual(expandedObject.newSeq1Index, 1);
-		assert.strictEqual(expandedObject.newSeq2Index, 0);
+		assert.strictEqual(expandedObject.expandedLeft, false);
 		assert.strictEqual(expandedObject.newSeed, 'AATT');
 		
 		//nie można rozszerzyć w prawo, bo sekwencja na bazie nie ma już symboli po prawej stronie
-		var expandedObject = expand.expand('ATT', 'AAATT', 'CGAAATTAGAC', 1, 3, scoringMatrix, 3);
+		var expandedObject = expand.expand('ATT', 'AAATT', 'CGAAATTAGAC', 2, 4, scoringMatrix, 3);
 		
 		test.object(expandedObject);
 		
 		console.log(expandedObject);
 		
 		assert.strictEqual(expandedObject.newScore, 4);
-		assert.strictEqual(expandedObject.newSeq1Index, 0);
-		assert.strictEqual(expandedObject.newSeq2Index, 2);
+		assert.strictEqual(expandedObject.expandedLeft, true);
 		assert.strictEqual(expandedObject.newSeed, 'AATT');
 		
 		//nie można rozszerzyć w prawo, bo sekwencja na bazie nie ma już symboli po prawej stronie
@@ -80,8 +76,7 @@ describe('Seed expanding function test', function(){
 		console.log(expandedObject);
 		
 		assert.strictEqual(expandedObject.newScore, 4);
-		assert.strictEqual(expandedObject.newSeq1Index, 0);
-		assert.strictEqual(expandedObject.newSeq2Index, 2);
+		assert.strictEqual(expandedObject.expandedLeft, true);
 		assert.strictEqual(expandedObject.newSeed, 'AAAT');
 	});
 	

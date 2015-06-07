@@ -127,12 +127,14 @@
             <div id="Screen2" style="display:none">
                 <h1>Etap 2.</h1>
                 <h2>Podział ciągu wejściowego na podsłowa</h2>
+                <p>Na tym etapie ciąg wejściowy dzielony jest na podsłowa o zadanej długości</p>
                 <h4>Ciąg wejściowy: <label id="sequenceLabel"></label></h4> 
                 <h4>Długość słowa: <label id="wordLengthLabel"></label></h4>
                 <h3>Uzyskane podsłowa:</h3>
                 <table class="table table-striped">
                     <tbody id="Tokens"></tbody>
                 </table>
+                <br /><br /><br /><br />
                 <nav class="navbar navbar-fixed-bottom navbar-default" id="bottomNavbar">
                     <div class="container-fluid">
                         <div id="navbar" class="navbar-collapse collapse">
@@ -147,6 +149,25 @@
                 </nav>
             </div>
             <div id="Screen3" style="display:none">
+                <h1>Etap 3.</h1>
+                <h2>Generacja grup słów - ziaren</h2>
+                <p>Na tym etapie generowane sa grupy podsłów powstałych przez podział ciągu wejściowego 
+                i słów podobnych do nich z miarą podobieństwa większą od zadanego progu.</p>
+                <h3>Uzyskane grupy słów - ziaren: </h3>
+                <div id="TokensAndSeeds"></div>
+                <br /><br /><br /><br />
+                <nav class="navbar navbar-fixed-bottom navbar-default" id="bottomNavbar">
+                    <div class="container-fluid">
+                        <div id="navbar" class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                <li id="previousStep"><a href="#" onclick="return show('Screen2');">Poprzedni krok</a></li>
+                                <li id="nextStep"><a href="#" onclick="return show('Screen4');">Następny krok</a></li>
+                            </ul>
+                        </div>
+                        <!--/.nav-collapse -->
+                    </div>
+                    <!--/.container-fluid -->
+                </nav>
             </div>
             <div id="Screen4" style="display:none">
             </div>

@@ -25,6 +25,7 @@ var matrix = [
 var sequence = "";
 var wordLength = "";
 var tokens = [];
+var seeds;
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -44,6 +45,31 @@ function prepareScreen2() {
     document.getElementById("sequenceLabel").innerHTML = sequence;
     document.getElementById("wordLengthLabel").innerHTML = wordLength.toString();
     refreshTokens();
+}
+
+function prepareScreen3() {
+    var div = document.getElementById("TokensAndSeeds");
+    //czyszczenie zawartości
+    while (div.firstChild) {
+        div.removeChild(div.firstChild);
+    }
+    for (var i = 0; i < seeds.length ; ++i) {
+        var panel = document.createElement("div");
+        panel.className = "panel panel-default";
+        var panelTitle = document.createElement("div");
+        panelTitle.className = "panel-heading";
+        var heading = document.createElement("h4");
+        heading.innerHTML = tokens[i];
+        panelTitle.appendChild(heading);
+        var table = document.createElement('table');
+        table.className = "table table-striped";
+        for (var j = 0; j < seeds[i].length; j++) {
+            table.insertRow(table.rows.length).insertCell(0).appendChild(document.createTextNode(seeds[i][j]));
+        }
+        panel.appendChild(panelTitle);
+        panel.appendChild(table);
+        div.appendChild(panel);
+    }
 }
 
 function processScreen1() {
@@ -66,10 +92,18 @@ function processScreen1() {
 
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
-        //podział na podsłowa
+        //PODZIAŁ NA PODSŁOWA
         tokens = ['ACGTC', 'CCCAG', 'AAACTG', 'GTCSC'] //tutaj skrypt dzielacy na podslowa
         prepareScreen2();
 
+        //GENERACJA GRUP SŁÓW - ZIAREN
+        //obiekt seeds - tablica tablic, w każdym rzędzie tablica słów ziaren uzyskanych dla jednego podsłowa z obiektu tokens
+        seeds = new Array();
+        for (var i = 0; i < tokens.length; ++i) {
+            var seedsForToken = ["AAAAA", "ACCGGT", "ACGTC", "ACGR"]; //tutaj skrypt generujacy slowa ziarna dla token[i]
+            seeds.push(seedsForToken);
+        }
+        prepareScreen3();
         show("Screen2");
     }
     else {

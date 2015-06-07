@@ -49,7 +49,7 @@ describe('High scoring pairs test', function(){
 		
 		test.array(pairs);
 		
-		assert.strictEqual(pairs["ATA"], 2);
+		assert.strictEqual(pairs[0].score, 2);
 		
 		console.log(pairs);
 	});

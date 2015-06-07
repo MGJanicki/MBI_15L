@@ -1,3 +1,56 @@
+/***************************************
+ *			START Utils.js		       *
+ ***************************************/
+ 
+function getNucletideIndex(nucleotide)
+{
+	switch(nucleotide)
+	{
+		case 'A': return 0;
+		case 'C': return 1;
+		case 'G': return 2;
+		case 'T': return 3;
+	}
+}
+
+function getNucleotideForIndex(index)
+{
+	switch(index)
+	{
+		case 0: return 'A';
+		case 1: return 'C';
+		case 2: return 'G';
+		case 3: return 'T';
+	}
+}
+
+//rekurencyjna funkcja generująca wszystkie możliwe sekwencje o zadanej długości
+function generateAllSequences(length, depth)
+{
+	if(length === depth)
+	{
+		return ['A', 'C', 'G', 'T'];
+	}
+
+	//tablice potrzebne przy generowaniu sekwencji - z wynikami działania poziom niżej oraz wyjściowa
+	var returnArray = [];
+	var partialSequencesArray = generateAllSequences(length, depth + 1);
+	
+	for(i = 0; i < partialSequencesArray.length; i++)
+	{
+		for(j = 0; j < 4; j++)
+		{
+			//doklejenie kolejnego nukleotydu do sekwencji - pętla w pętli zapewnia rozpatrzenie wszystkich możliwości
+			returnArray.push(partialSequencesArray[i].concat(getNucleotideForIndex(j)));
+		}
+	}
+	return returnArray;
+}
+
+/***************************************
+ *			END Utils.js		   	   *
+ ***************************************/
+
 ﻿/***************************************
  *			START Validator.js		   *
  ***************************************/
@@ -49,6 +102,72 @@ function validateMinimumScore(score)
 
 /***************************************
  *			END Validator.js		   *
+ ***************************************/
+
+ ﻿/***************************************
+ *			START StringUtils.js		   *
+ ***************************************/
+ 
+function getToken(word, tokenLength, position)
+{
+	return word.substring(position, position + tokenLength);
+}
+
+function tokenize(word, tokenLength)
+{
+	var tokens = [];
+	for(var i = 0; i + tokenLength <= word.length; i++)
+	{
+		tokens.push(getToken(word, tokenLength, i));
+	}
+	return tokens;
+}
+
+/***************************************
+ *			END StringUtils.js		   *
+ ***************************************/
+ 
+/***************************************
+ *		START HighScoringPairs.js	   *
+ ***************************************/
+ //funkcja oceny pary sekwencji dla zadanej macierzy podobieństwa
+//założenie - sekwencje na wejściu są tej samej długości (w końcu sami produkujemy sequence2 na podstawie sequence1)
+function score(sequence1, sequence2, scoringMatrix)
+{
+	var score = 0;
+	var nucleotideIndex1; //indeks w macierzy podobieństwa nukleotydu z pierwszej sekwencji
+	var nucleotideIndex2; //indeks w macierzy podobieństwa nukleotydu z drugiej sekwencji
+	for(i = 0; i < sequence1.length; i++)
+	{
+		nucleotideIndex1 = getNucletideIndex(sequence1[i]);
+		nucleotideIndex2 = getNucletideIndex(sequence2[i]);
+		score = score + parseInt(scoringMatrix[nucleotideIndex1][nucleotideIndex2]);
+	}
+	return score;
+}
+
+//funkcja znajdująca wszystkie wysoko oceniane pary dla zadanej sekwencji
+function findHSP(sequence, scoringMatrix, treshold)
+{
+	var hspArray = [];
+	var sequenceArray = generateAllSequences(sequence.length, 1);
+	var pairScore;
+	
+	for(var i = 0; i < sequenceArray.length; i++)
+	{
+		pairScore = score(sequence, sequenceArray[i], scoringMatrix);
+		//założenie - wartość progowa jest zaliczana do wysoko ocenianych par
+		if(pairScore >= treshold)
+		{
+			hspArray.push({seed: sequenceArray[i], sequence: sequenceArray[i]});
+		}
+	}
+	
+	return hspArray;
+}
+
+/***************************************
+ *		END HighScoringPairs.js	   	   *
  ***************************************/
 
 ﻿var shown = 'Info';
@@ -123,7 +242,7 @@ function prepareScreen3() {
         var table = document.createElement('table');
         table.className = "table table-striped";
         for (var j = 0; j < seeds[i].length; j++) {
-            table.insertRow(table.rows.length).insertCell(0).appendChild(document.createTextNode(seeds[i][j]));
+            table.insertRow(table.rows.length).insertCell(0).appendChild(document.createTextNode(seeds[i][j].sequence));
         }
         panel.appendChild(panelTitle);
         panel.appendChild(table);
@@ -186,26 +305,28 @@ function processScreen1() {
     }
     sequence = document.getElementById("sequence").value;
     wordLength = document.getElementById('word_length').value;
+	var tresholdT = parseInt(document.getElementById("TresholdT").value);
 	
     var err = "";
-    if (!validateSequence(sequence)) err += "Nieprawidłowy ciąg wejściowy! " //tutaj walidacja ciagu wejsciowego
-    if (!validateInputLength(wordLength)) err += "Nieprawidłowa długość słowa! "
-    if (!validateSequenceLength(wordLength, sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji"
-    if (!validateMatrix(matrix)) err += "Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
+    if (!validateSequence(sequence)) err += "Nieprawidłowy ciąg wejściowy! ";
+    if (!validateInputLength(wordLength)) err += "Nieprawidłowa długość słowa! ";
+    if (!validateSequenceLength(wordLength, sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji";
+    if (!validateMatrix(matrix)) err += "Nieprawidłowe wartości w macierzy!" ;
+	if (!validateMinimumScore(tresholdT)) err += "Niewłaściwa wartość progu T";
 
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
         //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugos= 7
         //PODZIAŁ NA PODSŁOWA
-        tokens = ["GATTTAG", "ATTTAGT", "TTTAGTA", "TTAGTAT"] //tutaj skrypt dzielacy na podslowa
+        tokens = tokenize(sequence, parseInt(wordLength)) //tutaj skrypt dzielacy na podslowa
         prepareScreen2();
 
         //GENERACJA GRUP SŁÓW - ZIAREN
         //obiekt seeds - tablica tablic, w każdym rzędzie tablica słów ziaren uzyskanych dla jednego podsłowa z obiektu tokens
         seeds = new Array();
-        for (var i = 0; i < tokens.length; ++i) {
-            var tresholdT = document.getElementById("TresholdT");
-            var seedsForToken = ["GATTTAG","ATTTAGT","TTTAGTA","TTAGTAT"]; //tutaj skrypt generujacy slowa ziarna dla token[i]
+		
+        for (var i = 0; i < tokens.length; ++i) {            
+            var seedsForToken = findHSP(tokens[i], matrix, tresholdT); //tutaj skrypt generujacy slowa ziarna dla token[i]
             seeds.push(seedsForToken);
         }
         prepareScreen3();

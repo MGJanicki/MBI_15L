@@ -401,6 +401,7 @@ function processScreen1() {
 
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
+        sequence = sequence.toUpperCase();
         //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugosc= 7
         //PODZIAŁ NA PODSŁOWA
         tokens = tokenize(sequence, parseInt(wordLength)) //tutaj skrypt dzielacy na podslowa

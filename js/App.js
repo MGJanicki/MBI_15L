@@ -51,8 +51,8 @@ function validateMinimumScore(score)
  *			END Validator.js		   *
  ***************************************/
 
-var shown = 'Info';
-var databaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
+﻿var shown = 'Info';
+var defaultDatabaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATGATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATTGTTAAATGTATATATTAATTCAATTTTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTTTATTATTAAAGGTATATATTAATTCAATATTATTATTCTATTCATTTTTTTTCATTTT",
@@ -77,8 +77,11 @@ var matrix = [
 ];
 var sequence = "";
 var wordLength = "";
+var databaseSets;
 var tokens = [];
 var seeds;
+var searchResults;
+var tresholdC;
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -128,6 +131,51 @@ function prepareScreen3() {
     }
 }
 
+function prepareScreen4() {
+    var div = document.getElementById("SearchResults");
+    //czyszczenie zawartości
+    while (div.firstChild) {
+        div.removeChild(div.firstChild);
+    }
+    for (var i = 0; i < seeds.length ; ++i) {
+        var panel = document.createElement("div");
+        panel.className = "panel panel-default";
+        var panelTitle = document.createElement("div");
+        panelTitle.className = "panel-heading";
+        var heading = document.createElement("h3");
+        heading.innerHTML = tokens[i];
+        panelTitle.appendChild(heading);
+        panel.appendChild(panelTitle);
+        for (var j = 0; j < seeds[i].length; ++j) {
+            var innerPanel = document.createElement("div");
+            innerPanel.className = "panel panel-default";
+            var innerPanelTitle = document.createElement("div");
+            innerPanelTitle.className = "panel-heading";
+            var innerHeading = document.createElement("h4");
+            innerHeading.innerHTML = seeds[i][j];
+            innerPanelTitle.appendChild(innerHeading);
+            innerPanel.appendChild(innerPanelTitle);
+            var table = document.createElement('table');
+            table.className = "table table-striped";
+            for (var k = 0; k < searchResults[i][j].length; ++k) {
+                var text = databaseSets[searchResults[i][j][k][0]];
+                var index =searchResults[i][j][k][1];
+                var seedLength=seeds[i][j].length;
+                var coloured = text.substring(0, index)
+                    + '<span style="color:#f00;">' + text.substring(index, index + seedLength) + '</span>'
+                    + text.substring(index + seedLength);
+                var cell = document.createElement("div");
+                cell.innerHTML = coloured;
+                table.insertRow(table.rows.length).insertCell(0)
+                    .appendChild(cell);              
+            }
+            innerPanel.appendChild(table);
+            panel.appendChild(innerPanel);
+        }
+        div.appendChild(panel);
+    }
+}
+
 function processScreen1() {
     matrix = new Array();
     for (var i = 0; i < letters.length; ++i) {
@@ -145,21 +193,57 @@ function processScreen1() {
     if (!validateSequenceLength(wordLength, sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji"
     if (!validateMatrix(matrix)) err += "Nieprawidłowe wartości w macierzy!" //tutaj walidacja macierzy
 
-
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
+        //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugos= 7
         //PODZIAŁ NA PODSŁOWA
-        tokens = ['ACGTC', 'CCCAG', 'AAACTG', 'GTCSC'] //tutaj skrypt dzielacy na podslowa
+        tokens = ["GATTTAG", "ATTTAGT", "TTTAGTA", "TTAGTAT"] //tutaj skrypt dzielacy na podslowa
         prepareScreen2();
 
         //GENERACJA GRUP SŁÓW - ZIAREN
         //obiekt seeds - tablica tablic, w każdym rzędzie tablica słów ziaren uzyskanych dla jednego podsłowa z obiektu tokens
         seeds = new Array();
         for (var i = 0; i < tokens.length; ++i) {
-            var seedsForToken = ["AAAAA", "ACCGGT", "ACGTC", "ACGR"]; //tutaj skrypt generujacy slowa ziarna dla token[i]
+            var tresholdT = document.getElementById("TresholdT");
+            var seedsForToken = ["GATTTAG","ATTTAGT","TTTAGTA","TTAGTAT"]; //tutaj skrypt generujacy slowa ziarna dla token[i]
             seeds.push(seedsForToken);
         }
         prepareScreen3();
+        //WYSZUKIWANIE CIAGÓW ZAWIERAJĄCYCH SŁOWA - ZIARNA
+        //aktualizacja bazy danych zawierających rekordy
+        databaseSets = new Array();
+        var dnaRecords = document.getElementById("DNARecords");
+        for (var i = 0; i < dnaRecords.rows.length; ++i) {
+            databaseSets.push(dnaRecords.rows[i].cells[0].firstChild.value);
+        }
+        //searchResults jest tablicą wielowymiarowa: 
+        //[indeks podslowa][indeks ziarna][[indeks slowa w bazie],[indeks ziarna w slowie z bazy]] 
+        searchResults = new Array();
+        for (var i = 0; i < tokens.length; ++i) {
+            //podslowa
+            var indexesForSubword = new Array();
+            for (var j = 0; j < seeds[i].length; ++j) {
+                var indexesForSeed = new Array();
+                //slowa ziarna
+                for (var k = 0; k < databaseSets.length; ++k) {
+                    //slowa w bazie
+                    databaseRecord = databaseSets[k];
+                    var index = databaseRecord.indexOf(seeds[i][j])
+                    //wystapienie w roznych miejscach dla tego samego slowa
+                    while (index > -1) {
+                        indexesForSeed.push([k,index]);
+                        databaseRecord = databaseRecord.substring(index + seeds[i][j].length);
+                        index = databaseRecord.indexOf(seeds[i][j])
+                    }
+                }
+                indexesForSubword.push(indexesForSeed);
+            }
+            searchResults.push(indexesForSubword);
+        }
+        prepareScreen4();
+
+        //DODAWANIE KOLEJNYCH NUKLEOTYDÓW
+        tresholdC = document.getElementById("TresholdC");
         show("Screen2");
     }
     else {
@@ -210,8 +294,8 @@ function addRow(table, text, disabled) {
 function resetDNARecords() {
     var table = document.createElement('tbody');
     table.id = 'DNARecords';
-    for (var i = 0; i < databaseSets.length; ++i) {
-        addRow(table, databaseSets[i], true)
+    for (var i = 0; i < defaultDatabaseSets.length; ++i) {
+        addRow(table, defaultDatabaseSets[i], true)
     }
     var old_tbody = document.getElementById('DNARecords');
     old_tbody.parentNode.replaceChild(table, old_tbody)

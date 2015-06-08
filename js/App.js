@@ -737,7 +737,7 @@ function addRow(table, text, disabled) {
     element1.style = "width: 100%";
     if (disabled) element1.disabled = "true";
     element1.value = text;
-	element1.onblur = function() {validateNewDNARecord(this.value)};
+	element1.onblur = function() {validateDatabaseChange()};
     cell1.appendChild(element1);
     var cell2 = row.insertCell(1);
     var element2 = document.createElement("a");
@@ -748,16 +748,18 @@ function addRow(table, text, disabled) {
     cell2.appendChild(element2);
 }
 
-function validateNewDNARecord(sequence)
+function validateDatabaseChange()
 {
-	if(!validateSequence(sequence))
+	databaseOK = true;
+	var dnaRecords = document.getElementById("DNARecords");
+	for (var i = 0; i < dnaRecords.rows.length; ++i) 
 	{
-		databaseOK = false;
-	}
-	else
-	{
-		databaseOK = true;
-	}
+		if(!validateSequence(dnaRecords.rows[i].cells[0].firstChild.value))
+		{
+			databaseOK = false;
+			break;
+		}        
+    }
 }
 
 function resetDNARecords() {

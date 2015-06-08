@@ -54,23 +54,23 @@
             </div>
             <div id="Screen1" style="display:none">
                 <h1>Etap 1.</h1>
-                <h2>Ustaw parametry demonstracji</h2>
-                <h3>Wprowadź sekwencję:</h3>
+                <h2>Konfiguracja parametrów demonstracji</h2>
+                <h3>Sekwencja do wyszukania:</h3>
                 <input title="Wprowadź sekwencję aminokwasową do porównwania z sekwencjami w bazie danych. Sekwencja musi składać się jedynie z liter A, T, C, G"
                        style="width: 50%" type="text" class="form-control" id="sequence" />
-                <h3>Wybierz długość słowa:</h3>
+                <h3>Długość słowa:</h3>
                 <input title="Wybierz długość słów dla których obliczany będzie stopień zgodności"
                        class="input-sm" type="number" min="1" id="word_length" value="1" />
-                <h3>Wybierz wartość progu T:</h3>
+                <h3>Wartość progu T:</h3>
                 <input title="Wybierz próg minimalnej zgodnosci słów - ziaren z podsłowami"
                        class="input-sm" type="number" min="1" id="TresholdT" value="1" />
-                <h3>Wybierz wartość progu C:</h3>
+                <h3>Wartość progu C:</h3>
                 <input title="Wybierz próg minimalnego lokalnego podobieństwa porównywanych ciągów"
                        class="input-sm" type="number" min="1" id="TresholdC" value="1" />
-                <h3>Wybierz wartość kary za przerwę:</h3>
+                <h3>Wartość kary za przerwę:</h3>
                 <input title="Wybierz wartość kary za przerwę w algorytmie Smitha-Watermanna"
                        class="input-sm" type="number" min="1" id="gapPenalty" value="1" />
-                <h3>Ustaw parametry macierzy podobieństwa:</h3>
+                <h3>Parametry macierzy podobieństwa:</h3>
                 <table class="table table-bordered" style="width: 30%">
                     <thead>
                         <tr>
@@ -180,7 +180,7 @@
             </div>
             <div id="Screen4" style="display:none">
                 <h1>Etap 4.</h1>
-                <h2>Wyszukiwanie podobnych słów</h2>
+                <h2>Wyszukiwanie ciągów zawierających słowa- ziarna</h2>
                 <p>
                     Na tym etapie wyszukiwane są w bazie danych ciągi zawierające słowa-ziarna
                 </p>
@@ -238,8 +238,8 @@
                 <h2>Wynik działania algorytmu</h2>
                 <p>
                     Słowa z bazy danych, które nie zostały odrzucone w poprzdnich etapach przetwarzania są porównywane z ciągiem wejściowym
-                    za pomocą algorytmu Smitha-Watermanna. <br />
-                    Wynikiem działania algorytmu jest lista podobnych do wprowadzonego ciągów z bazy danych.
+                    za pomocą algorytmu Smitha-Watermana. <br />
+                    Wynikiem działania algorytmu jest lista ciągów z bazy danych podobnych do wprowadzonej sekwencji.
                 </p>
                 <h4>Ciąg wejściowy: <label id="sequenceLabel2"></label></h4>
                 <h4>Kara za przerwę: <label id="gapPenaltyLabel"></label></h4>

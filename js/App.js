@@ -237,6 +237,8 @@ var seeds;
 var searchResults;
 var tresholdC;
 var finished=false;
+var gapPenalty;
+var results;
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -245,7 +247,9 @@ function show(subpageToShow) {
     return false;
 }
 
-function refreshTokens() {
+function prepareScreen2() {
+    document.getElementById("sequenceLabel").innerHTML = sequence;
+    document.getElementById("wordLengthLabel").innerHTML = wordLength.toString();
     var table = document.getElementById("Tokens");
     while (table.firstChild) {
         table.removeChild(table.firstChild);
@@ -253,12 +257,6 @@ function refreshTokens() {
     for (var i = 0; i < tokens.length; ++i) {
         table.insertRow(table.rows.length).insertCell(0).appendChild(document.createTextNode(tokens[i]));
     }
-}
-
-function prepareScreen2() {
-    document.getElementById("sequenceLabel").innerHTML = sequence;
-    document.getElementById("wordLengthLabel").innerHTML = wordLength.toString();
-    refreshTokens();
 }
 
 function prepareScreen3() {
@@ -331,15 +329,6 @@ function prepareScreen4() {
     }
 }
 
-function finish() {
-    if (finished) {
-        show("Screen6");
-    }
-    else {
-        alert('Nie wykonano wszystkich kroków algorytmu!');
-    }
-}
-
 function prepareScreen5() {
     var div = document.getElementById("RatingRecords");
     //czyszczenie zawartości
@@ -354,11 +343,13 @@ function prepareScreen5() {
                 var index = searchResults[i][j][k].index;
 				var leftOffset = searchResults[i][j][k].moveLeft;
                 var header1 = document.createElement('h3');
-                header1.innerHTML = "Słowo- ziarno: " + seed;
-                var header2 = document.createElement('h4');
-                header2.innerHTML = "Wynik: " + searchResults[i][j][k].score.toString();
+                header1.innerHTML = "Podsłowo: " + tokens[i];
+                var header2 = document.createElement('h3');
+                header2.innerHTML = "Słowo- ziarno: " + seeds[i][j].sequence;
+                var header3 = document.createElement('h4');
+                header3.innerHTML = "Wynik: " + searchResults[i][j][k].score.toString();
                 if (searchResults[i][j][k].score < tresholdC)
-                    header2.innerHTML = header2.innerHTML +  '<span style="color:#f00;"> Rekord odrzucony</span>';
+                    header3.innerHTML = header3.innerHTML +  '<span style="color:#f00;"> Rekord odrzucony</span>';
                 var table = document.createElement('table');
                 table.className = "table table-bordered";
                 var row_0 = table.insertRow(table.rows.length);
@@ -374,6 +365,7 @@ function prepareScreen5() {
                 }
                 div.appendChild(header1);
                 div.appendChild(header2);
+                div.appendChild(header3);
                 div.appendChild(table);
             }
         }
@@ -406,13 +398,14 @@ function processStep() {
                     searchResults[i][j][k].score = result.newScore;
 					if(result.expandedLeft)
 					{
-						searchResults[i][j][k].moveLeft = searchResults[i][j][k].moveLeft + 1; //trochę nie ufam operatorowi ++
+						searchResults[i][j][k].moveLeft = searchResults[i][j][k].moveLeft + 1; 
 					}
 					searchResults[i][j][k].seed = result.newSeed;                    
                 }
             }
         }
     }
+    if(finished) alert("Wykonano wszystkie kroki algorytmu, możesz przejść do kolejnego etapu.")
 }
 
 
@@ -425,6 +418,50 @@ function executeAll() {
     //wykonaj wszystkie kroki do konca
     while (!finished) processStep();
     prepareScreen5();
+}
+
+function prepareScreen6() {
+    document.getElementById("sequenceLabel2").innerHTML = sequence;
+    document.getElementById("gapPenaltyLabel").innerHTML = gapPenalty;
+    var table = document.getElementById("Results");
+    while (table.firstChild) {
+        table.removeChild(table.firstChild);
+    }
+    for (var i = 0; i < results.length; ++i) {
+        var row=table.insertRow(table.rows.length);
+        var cell0 = row.insertCell(0).appendChild(document.createTextNode(results[i].sequence));
+        var cell1 = row.insertCell(1).appendChild(document.createTextNode(results[i].score));
+    }
+}
+
+function finish() {
+    if (finished) {
+        gapPenalty = document.getElementById("gapPenalty").value;
+        //rekordy z bazy danych bez powtórzeń
+        var disctinctDbSetNrs = new Array();
+        for (var i = 0; i < searchResults.length; ++i) {
+            for (var j = 0; j < searchResults[i].length; ++j) {
+                for (var k = 0; k < searchResults[i][j].length; ++k) {
+                    if (searchResults[i][j][k].score > tresholdC) {
+                        if (disctinctDbSetNrs.indexOf(searchResults[i][j][k].DbSetNr) == -1)
+                            disctinctDbSetNrs.push(searchResults[i][j][k].DbSetNr);
+                    }
+                } 
+            }
+        }
+        results = new Array();
+        for (var i=0; i < disctinctDbSetNrs.length; ++i) {
+            var dbSequence = databaseSets[disctinctDbSetNrs[i]];
+            var score = 10; //tutaj funkcja Smith-Watermanna SW(sequence,dbSequence,matrix,gapPenalty)
+            results.push({ sequence: dbSequence, score: score}); 
+        }
+        results.sort(function (a, b) { return parseInt(b.score) - parseInt(a.score) }); //sortowanie malejąco
+        prepareScreen6();
+        show("Screen6");
+    }
+    else {
+        alert('Nie wykonano wszystkich kroków algorytmu!');
+    }
 }
 
 function processScreen1() {
@@ -489,13 +526,13 @@ function processScreen1() {
 					var offset = 0;
                     //wystapienie w roznych miejscach dla tego samego slowa
                     while (index > -1) {
-                        var seed = seeds[i][j].sequence;
-                        var seed_length = seed.length;
-                        var stringToCompare = databaseRecord.substring(index, index+seed_length);
-                        var rate = score(seed,stringToCompare,matrix); 
-                        indexesForSeed.push({ DbSetNr: k, seed: seed, index: index + offset, moveLeft: 0, score: rate });
-						offset = offset + index + seeds[i][j].sequence.length;
-                        databaseRecord = databaseRecord.substring(index + seeds[i][j].sequence.length);
+                        var token = tokens[i];
+                        var token_length = token.length;
+                        var stringToCompare = databaseRecord.substring(index, index+token_length);
+                        var rate = score(token,stringToCompare,matrix); 
+                        indexesForSeed.push({ DbSetNr: k, seed: token, index: index + offset, moveLeft: 0, score: rate });
+                        offset = offset + index + token_length;
+                        databaseRecord = databaseRecord.substring(index + token_length);
                         index = databaseRecord.indexOf(seeds[i][j].sequence);
                     }
                 }

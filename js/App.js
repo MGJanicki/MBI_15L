@@ -169,6 +169,41 @@ function findHSP(sequence, scoringMatrix, treshold)
 /***************************************
  *		END HighScoringPairs.js	   	   *
  ***************************************/
+ 
+/***************************************
+ *		START Expand.js	   	   		   *
+ ***************************************/
+ 
+ function expand(seed, sequence1, sequence2, seq1Index, seq2Index, scoringMatrix, oldScore)
+{
+	var result = {expandedLeft: false, expandedRight: false, newSeed: seed, newScore: oldScore};
+	
+	//sprawdzam czy można rozszerzyć w lewo
+	if(seq1Index !== 0 && seq2Index !== 0)
+	{
+		var tokenNucletide = sequence1.charAt(seq1Index - 1);
+		var recordNucleotide = sequence2.charAt(seq2Index - 1);
+		result.expandedLeft = true;		
+		result.newSeed = tokenNucletide.concat(result.newSeed);		
+		result.newScore = result.newScore + parseInt(scoringMatrix[getNucletideIndex(tokenNucletide)][getNucletideIndex(recordNucleotide)]);
+	}
+	
+	//sprawdzam czy można rozszerzyć w prawo
+	if(seq1Index + seed.length < sequence1.length && seq2Index + seed.length < sequence2.length)
+	{
+		var tokenNucletide = sequence1.charAt(seq1Index + seed.length);
+		var recordNucleotide = sequence2.charAt(seq2Index + seed.length);
+		result.expandedRight = true;
+		result.newSeed = result.newSeed.concat(tokenNucletide);		
+		result.newScore = result.newScore + parseInt(scoringMatrix[getNucletideIndex(tokenNucletide)][getNucletideIndex(recordNucleotide)]);
+	}
+	
+	return result;
+}
+ 
+/***************************************
+ *		END Expand.js			   	   *
+ ***************************************/
 
 ﻿var shown = 'Info';
 var defaultDatabaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
@@ -317,6 +352,7 @@ function prepareScreen5() {
                 var text = databaseSets[searchResults[i][j][k].DbSetNr];
                 var seed = searchResults[i][j][k].seed;
                 var index = searchResults[i][j][k].index;
+				var leftOffset = searchResults[i][j][k].moveLeft;
                 var header1 = document.createElement('h3');
                 header1.innerHTML = "Słowo- ziarno: " + seed;
                 var header2 = document.createElement('h4');
@@ -329,11 +365,11 @@ function prepareScreen5() {
                 var row_1 = table.insertRow(table.rows.length);
                 for (var l = 0; l < text.length; ++l) {
                     row_0.insertCell(l).appendChild(document.createTextNode(text[l]));
-                    if (l < index || l >= index + seed.length) {
+                    if (l < index - leftOffset || l >= index - leftOffset + seed.length) {
                         row_1.insertCell(l).appendChild(document.createTextNode(''));
                     }
                     else {
-                        row_1.insertCell(l).appendChild(document.createTextNode(seed[l - index]));
+                        row_1.insertCell(l).appendChild(document.createTextNode(seed[l - index + leftOffset]));
                     }
                 }
                 div.appendChild(header1);
@@ -349,18 +385,30 @@ function processStep() {
     for (var i = 0; i < searchResults.length; ++i) {
         for (var j = 0; j < searchResults[i].length; ++j) {
             for (var k = 0; k < searchResults[i][j].length; ++k) {
-                var result = searchResults[i][j][k]
-                var moveLeft = result.moveLeft;
-                var indexInDbSet = result.index - moveLeft
+                var searchedSeed = searchResults[i][j][k];
+                var moveLeft = searchedSeed.moveLeft;
+                var indexInDbSet = searchedSeed.index - moveLeft;
                 var indexInSequence = i - moveLeft;
-                var databaseSet = databaseSets[result.DbSetNr];
-                var seed = result.seed;
-                var currScore = result.score;
+                var databaseSet = databaseSets[searchedSeed.DbSetNr];
+                var seed = searchedSeed.seed;
+                var currScore = searchedSeed.score;
                 if (currScore >= tresholdC&&seed.length<sequence.length) { //przetwarzamy tylko rekordy o minimalnej zgodności
-                    var result = 0 //expand(seed,sequence,databaseSet,indexInDbSet,indexInSequence,currScore); tutaj funkcja expand
+					//(seed, sequence1, sequence2, seq1Index, seq2Index, scoringMatrix, oldScore)
+                    var result = expand(seed,sequence,databaseSet,indexInSequence, indexInDbSet, matrix,currScore);
+					
+					//jezeli udało się rozszerzyć chociaz jeden rekord to nie skonczylismy
+					if(result.expandedLeft || result.expandedRight)
+					{
+						finished = false; 
+					}
+					
                     //logika aktualizujaca rekord w searchResults - do napisania
-                    searchResults[i][j][k].score = 0;
-                    finished = false; //jezeli chociaz jeden rekord zostal przetworzony to nie skonczylismy
+                    searchResults[i][j][k].score = result.newScore;
+					if(result.expandedLeft)
+					{
+						searchResults[i][j][k].moveLeft = searchResults[i][j][k].moveLeft + 1; //trochę nie ufam operatorowi ++
+					}
+					searchResults[i][j][k].seed = result.newSeed;                    
                 }
             }
         }
@@ -437,13 +485,15 @@ function processScreen1() {
                     //slowa w bazie
                     databaseRecord = databaseSets[k];
                     var index = databaseRecord.indexOf(seeds[i][j].sequence);
+					var offset = 0;
                     //wystapienie w roznych miejscach dla tego samego slowa
                     while (index > -1) {
                         var seed = seeds[i][j].sequence;
                         var seed_length = seed.length;
                         var stringToCompare = databaseRecord.substring(index, index+seed_length);
                         var rate = score(seed,stringToCompare,matrix); 
-                        indexesForSeed.push({ DbSetNr: k, seed: seed, index: index, moveLeft: 0, score: rate });
+                        indexesForSeed.push({ DbSetNr: k, seed: seed, index: index + offset, moveLeft: 0, score: rate });
+						offset = offset + index + seeds[i][j].sequence.length;
                         databaseRecord = databaseRecord.substring(index + seeds[i][j].sequence.length);
                         index = databaseRecord.indexOf(seeds[i][j].sequence);
                     }

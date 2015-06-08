@@ -12,7 +12,7 @@ var utils = require('./Utils.js');
  */
 function expand(seed, sequence1, sequence2, seq1Index, seq2Index, scoringMatrix, oldScore)
 {
-	var result = {expandedLeft: false, newSeed: seed, newScore: oldScore};
+	var result = {expandedLeft: false, expandedRight: false, newSeed: seed, newScore: oldScore};
 	
 	//sprawdzam czy można rozszerzyć w lewo
 	if(seq1Index !== 0 && seq2Index !== 0)
@@ -29,6 +29,7 @@ function expand(seed, sequence1, sequence2, seq1Index, seq2Index, scoringMatrix,
 	{
 		var tokenNucletide = sequence1.charAt(seq1Index + seed.length);
 		var recordNucleotide = sequence2.charAt(seq2Index + seed.length);
+		result.expandedRight = true;
 		result.newSeed = result.newSeed.concat(tokenNucletide);		
 		result.newScore = result.newScore + scoringMatrix[utils.getNucletideIndex(tokenNucletide)][utils.getNucletideIndex(recordNucleotide)];
 	}

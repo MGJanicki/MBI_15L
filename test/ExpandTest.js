@@ -33,6 +33,7 @@ describe('Seed expanding function test', function(){
 		
 		assert.strictEqual(expandedObject.newScore, 5);
 		assert.strictEqual(expandedObject.expandedLeft, true);
+		assert.strictEqual(expandedObject.expandedRight, true);
 		assert.strictEqual(expandedObject.newSeed, 'AAATT');
 		
 		//nie można rozszerzyć w lewo, bo szukane słowo nie ma już symboli po lewej stronie
@@ -44,6 +45,7 @@ describe('Seed expanding function test', function(){
 		
 		assert.strictEqual(expandedObject.newScore, 4);
 		assert.strictEqual(expandedObject.expandedLeft, false);
+		assert.strictEqual(expandedObject.expandedRight, true);
 		assert.strictEqual(expandedObject.newSeed, 'AAAT');
 		
 		//nie można rozszerzyć w lewo, bo sekwencja na bazie nie ma już symboli po lewej stronie
@@ -55,6 +57,7 @@ describe('Seed expanding function test', function(){
 		
 		assert.strictEqual(expandedObject.newScore, 4);
 		assert.strictEqual(expandedObject.expandedLeft, false);
+		assert.strictEqual(expandedObject.expandedRight, true);
 		assert.strictEqual(expandedObject.newSeed, 'AATT');
 		
 		//nie można rozszerzyć w prawo, bo sekwencja na bazie nie ma już symboli po prawej stronie
@@ -66,6 +69,7 @@ describe('Seed expanding function test', function(){
 		
 		assert.strictEqual(expandedObject.newScore, 4);
 		assert.strictEqual(expandedObject.expandedLeft, true);
+		assert.strictEqual(expandedObject.expandedRight, false);
 		assert.strictEqual(expandedObject.newSeed, 'AATT');
 		
 		//nie można rozszerzyć w prawo, bo sekwencja na bazie nie ma już symboli po prawej stronie
@@ -77,6 +81,7 @@ describe('Seed expanding function test', function(){
 		
 		assert.strictEqual(expandedObject.newScore, 4);
 		assert.strictEqual(expandedObject.expandedLeft, true);
+		assert.strictEqual(expandedObject.expandedRight, false);
 		assert.strictEqual(expandedObject.newSeed, 'AAAT');
 	});
 	

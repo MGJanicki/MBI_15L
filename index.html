@@ -60,16 +60,16 @@
                        style="width: 50%" type="text" class="form-control" id="sequence" />
                 <h3>Długość słowa:</h3>
                 <input title="Wybierz długość słów dla których obliczany będzie stopień zgodności"
-                       class="input-sm" type="number" min="1" id="word_length" value="1" />
+                       class="input-sm" type="number" id="word_length" value="1" />
                 <h3>Wartość progu T:</h3>
                 <input title="Wybierz próg minimalnej zgodnosci słów - ziaren z podsłowami"
-                       class="input-sm" type="number" min="1" id="TresholdT" value="1" />
+                       class="input-sm" type="number" id="TresholdT" value="1" />
                 <h3>Wartość progu C:</h3>
                 <input title="Wybierz próg minimalnego lokalnego podobieństwa porównywanych ciągów"
-                       class="input-sm" type="number" min="1" id="TresholdC" value="1" />
+                       class="input-sm" type="number" id="TresholdC" value="1" />
                 <h3>Wartość kary za przerwę:</h3>
                 <input title="Wybierz wartość kary za przerwę w algorytmie Smitha-Watermanna"
-                       class="input-sm" type="number" min="1" id="gapPenalty" value="1" />
+                       class="input-sm" type="number" id="gapPenalty" value="-1" />
                 <h3>Parametry macierzy podobieństwa:</h3>
                 <table class="table table-bordered" style="width: 30%">
                     <thead>
@@ -237,9 +237,9 @@
                 <h1>Etap 6.</h1>
                 <h2>Wynik działania algorytmu</h2>
                 <p>
-                    Słowa z bazy danych, które nie zostały odrzucone w poprzdnich etapach przetwarzania są porównywane z ciągiem wejściowym
+                    Słowa z bazy danych, które nie zostały odrzucone w poprzednich etapach przetwarzania są porównywane z ciągiem wejściowym
                     za pomocą algorytmu Smitha-Watermana. <br />
-                    Wynikiem działania algorytmu jest lista ciągów z bazy danych podobnych do wprowadzonej sekwencji.
+                    Wynikiem działania algorytmu jest lista ciągów z bazy danych podobnych do wprowadzonej sekwencji wraz z oceną ich lokalnego podobieństwa.
                 </p>
                 <h4>Ciąg wejściowy: <label id="sequenceLabel2"></label></h4>
                 <h4>Kara za przerwę: <label id="gapPenaltyLabel"></label></h4>

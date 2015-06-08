@@ -205,6 +205,157 @@ function findHSP(sequence, scoringMatrix, treshold)
  *		END Expand.js			   	   *
  ***************************************/
 
+/***************************************
+ *		START SmithWaterman.js	   	   *
+ ***************************************/
+ 
+/*
+* Komórka macierzy w algorytmie Smitha-Watermana składa się z dwóch elementów.
+* Pierwszym z nich jest wartość funkcji podobieństwa (score), a drugim komórka która posłużyła 
+* do wyznaczenia jej wartości (direction).
+*/
+
+/*
+* Rezultatem działania algorytmu Smitha-Watermana jest tablica obiektów z najlepszymi lokalnymi
+* dopasowaniami podobieństwa. Na taki obiekt składa się informacja o indeksie w pierwszej sekwencji,
+* ocena lokalnego podobieństwa oraz długość sekwencji.
+*/
+
+/**
+ * row - rząd, w którym znajduje się aktualnie wypełniania komórka
+ * column - kolumna, w którym znajduje się aktualnie wypełniania komórka
+ * similarityMatrix - uzupełniana macierz
+ * symbolCost - koszt symbolu pobrany z macierzy podobieństwa
+ * gapCost - koszt przerwy
+ */
+function similarityFunction(row, column, similarityMatrix, symbolCost, gapCost)
+{
+	//komorka macierzy będąca rezultatem funkcji wyliczającej podobieństwo
+	var result = {score: 0, row: -1, column: -1}; 
+
+	//wartości potrzebne do znalezienia wyniku funkcji podobieństwa F(i, j)
+	var rowCost = similarityMatrix[row-1][column].score + gapCost;
+	var columnCost = similarityMatrix[row][column-1].score + gapCost;
+	var diagonalCost = similarityMatrix[row-1][column-1].score + symbolCost;	
+	
+	if(rowCost > result.score)
+	{
+		result.score = rowCost;
+		result.row = row - 1;
+		result.column = column;
+	}
+	
+	if(columnCost > result.score)
+	{
+		result.score = columnCost;
+		result.row = row;
+		result.column = column - 1;
+	}
+	
+	if(diagonalCost > result.score)
+	{
+		result.score = diagonalCost;
+		result.row = row - 1;
+		result.column = column - 1;
+	}	
+	
+	return result;
+}
+
+/*
+* Funkcja wyciąga z macierzy obiekt zawierający długość i indeks początku sekwencji
+*/
+function getSequence(row, column, similarityMatrix)
+{
+	var cell = similarityMatrix[row][column];
+	//inicjalizacja zmiennej wynikowej
+	var result = {score: similarityMatrix[row][column].score, sequenceLength: 0, index: -1};
+	
+	while(cell.row !== -1)
+	{
+		result.index = cell.column;
+		result.sequenceLength++;
+		cell = similarityMatrix[cell.row][cell.column];
+	}
+		
+	return result;
+}
+
+/*
+* Funkcja zwraca tablicę obiektów przechowujących informacje o najlepszych lokalnych podobieństwach sekwencji.
+* Obiekt składa się z trzech pól - indeksu symbolu w pierwszej sekwencji, od którego zaczyna się sekwencja podobna,
+* oceny sekwencji oraz jej długości
+*/
+function getBest(similarityMatrix)
+{
+	var best = [];
+	best.push({score: 0, row: -1, column: 0});
+	//iteracja po komórkach macierzy z wynikami
+	for(i = 1; i < similarityMatrix.length; i++)
+	{
+		for(j = 1; j < similarityMatrix[i].length; j++)
+		{
+			if(similarityMatrix[i][j].score > best[0].score)
+			{
+				best = [];
+				best.push({score: similarityMatrix[i][j].score, row: i, column: j});
+			}
+			else if(similarityMatrix[i][j].score === best[0].score)
+			{
+				best.push({score: similarityMatrix[i][j].score, row: i, column: j});
+			}
+		}
+	}
+	
+	var results = [];
+	for(i = 0; i < best.length; i++)
+	{
+		results.push(getSequence(best[i].row, best[i].column, similarityMatrix));
+	}
+	
+	return results;
+}
+
+//funkcja zwraca tablicę obiektów z najlepszymi lokalnymi dopasowaniami
+function smithWaterman(sequence1, sequence2, scoringMatrix, gapCost)
+{	
+	//inicjalizacja macierzy służącej do porównania sekwencji
+	var matrix = [];
+	for(i = 0; i < sequence2.length + 1; i++)
+	{
+		matrix[i] = [];
+		if(i > 0)
+		{
+			var seq2NucleotideIndex = getNucletideIndex(sequence2.charAt(i - 1));
+		}
+		for(j = 0; j < sequence1.length + 1; j++)
+		{		
+			// inicjalizacja brzegów macierzy
+			if(i === 0 || j === 0)
+			{
+				matrix[i][j] = {score: 0, row: -1, column: -1};
+			}
+			else
+			{
+				//wyznaczenie wartości komórek macierzy przy pomocy funkcji podobieństwa F(i, j)
+				var seq1NucleotideIndex = getNucletideIndex(sequence1.charAt(j - 1));
+				var symbolCost = parseInt(scoringMatrix[seq1NucleotideIndex][seq2NucleotideIndex]);
+				
+				var score = similarityFunction(i, j, matrix, symbolCost, gapCost);
+				
+				matrix[i][j] = score;
+			}			
+		}
+	}
+	
+	var results = getBest(matrix);
+	return results;
+}
+ 
+/***************************************
+ *		END SmithWaterman.js	   	   *
+ ***************************************/
+ 
 ﻿var shown = 'Info';
 var defaultDatabaseSets = ["ATTGATTTAGTATATTATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
     "ATTGATTTAGTATATGATTAAATGTATATATTAATTCAATATTATTATTCTATTCATTTTTATTCATTTT",
@@ -239,6 +390,7 @@ var tresholdC;
 var finished=false;
 var gapPenalty;
 var results;
+var databaseOK = true;
 
 function show(subpageToShow) {
     document.getElementById(shown).style.display = 'none';
@@ -427,10 +579,11 @@ function prepareScreen6() {
     while (table.firstChild) {
         table.removeChild(table.firstChild);
     }
+	
     for (var i = 0; i < results.length; ++i) {
         var row=table.insertRow(table.rows.length);
         var cell0 = row.insertCell(0).appendChild(document.createTextNode(results[i].sequence));
-        var cell1 = row.insertCell(1).appendChild(document.createTextNode(results[i].score));
+		var cell1 = row.insertCell(1).appendChild(document.createTextNode(results[i].score));
     }
 }
 
@@ -451,9 +604,9 @@ function finish() {
         }
         results = new Array();
         for (var i=0; i < disctinctDbSetNrs.length; ++i) {
-            var dbSequence = databaseSets[disctinctDbSetNrs[i]];
-            var score = 10; //tutaj funkcja Smith-Watermanna SW(sequence,dbSequence,matrix,gapPenalty)
-            results.push({ sequence: dbSequence, score: score}); 
+            var dbSequence = databaseSets[disctinctDbSetNrs[i]];			
+            var result = smithWaterman(dbSequence, sequence, matrix, parseInt(gapPenalty));
+            results.push({ sequence: dbSequence, score: result[0].score}); 
         }
         results.sort(function (a, b) { return parseInt(b.score) - parseInt(a.score) }); //sortowanie malejąco
         prepareScreen6();
@@ -476,20 +629,25 @@ function processScreen1() {
     sequence = document.getElementById("sequence").value;
     wordLength = document.getElementById('word_length').value;
 	var tresholdT = parseInt(document.getElementById("TresholdT").value);
+	tresholdC = parseInt(document.getElementById("TresholdC").value);
+	var gapPenalty = parseInt(document.getElementById("gapPenalty").value);
 	
+	//walidacje danych wejściowych
     var err = "";
-    if (!validateSequence(sequence)) err += "Nieprawidłowy ciąg wejściowy! ";
-    if (!validateInputLength(wordLength)) err += "Nieprawidłowa długość słowa! ";
-    if (!validateSequenceLength(wordLength, sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji";
-    if (!validateMatrix(matrix)) err += "Nieprawidłowe wartości w macierzy!" ;
-	if (!validateMinimumScore(tresholdT)) err += "Niewłaściwa wartość progu T";
+    if (!validateSequence(sequence)) err += "Nieprawidłowy ciąg wejściowy!\n";
+    if (!validateInputLength(wordLength)) err += "Nieprawidłowa długość słowa!\n";
+    if (!validateSequenceLength(wordLength, sequence.length)) err += "Długość słowa musi być mniejsza lub równa długości wyszukiwanej sekwencji!\n";
+    if (!validateMatrix(matrix)) err += "Nieprawidłowe wartości w macierzy!\n";
+	if (!validateMinimumScore(tresholdT)) err += "Niewłaściwa wartość progu T!\n";
+	if (!validateMinimumScore(tresholdC)) err += "Niewłaściwa wartość progu C!\n";
+	if (!validateMinimumScore(gapPenalty)) err += "Wartość kary za przerwę powinna być liczbą!\n";
+	if (!databaseOK) err += "W bazie znajdują się błędne rekordy!\n";
 
     if (err == "") {
         //DZIAŁANIE ALGORYTMU
         sequence = sequence.toUpperCase();
-        //wartosci testowe: GATTTAGTATTTTATTAAATGT, dlugosc= 7
         //PODZIAŁ NA PODSŁOWA
-        tokens = tokenize(sequence, parseInt(wordLength)) //tutaj skrypt dzielacy na podslowa
+        tokens = tokenize(sequence, parseInt(wordLength))
         prepareScreen2();
 
         //GENERACJA GRUP SŁÓW - ZIAREN
@@ -579,6 +737,7 @@ function addRow(table, text, disabled) {
     element1.style = "width: 100%";
     if (disabled) element1.disabled = "true";
     element1.value = text;
+	element1.onblur = function() {validateNewDNARecord(this.value)};
     cell1.appendChild(element1);
     var cell2 = row.insertCell(1);
     var element2 = document.createElement("a");
@@ -587,6 +746,18 @@ function addRow(table, text, disabled) {
     element2.onclick = function () { deleteRow(this); }
     element2.innerHTML="<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>";
     cell2.appendChild(element2);
+}
+
+function validateNewDNARecord(sequence)
+{
+	if(!validateSequence(sequence))
+	{
+		databaseOK = false;
+	}
+	else
+	{
+		databaseOK = true;
+	}
 }
 
 function resetDNARecords() {
